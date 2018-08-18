@@ -125,6 +125,7 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
     cli_set_process_title("Live Chat and Like Output");
     $lastCommentTs = 0;
     $lastLikeTs = 0;
+    $lastCommentPin = -1;
     $exit = false;
 
     @unlink(__DIR__ . '/request');
@@ -160,6 +161,21 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             unlink(__DIR__ . '/request');
             sleep(2);
             exit();
+        } elseif ($cmd == 'pin') {
+            $commentId = $values[0];
+            $ig->live->pinComment($broadcastId, $commentId);
+            $lastCommentPin = $commentId;
+            logM("Pinned a comment!");
+            unlink(__DIR__ . '/request');
+        } elseif ($cmd == 'unpin') {
+            if ($lastCommentPin == -1) {
+                logM("You have no comment pinned!");
+            } else {
+                $ig->live->unpinComment($broadcastId, $lastCommentPin);
+                $lastCommentPin = -1;
+                logM("Unpinned the pinned comment!");
+            }
+            unlink(__DIR__ . '/request');
         } elseif ($cmd == 'url') {
             logM("================================ Stream URL ================================\n" . $streamUrl . "\n================================ Stream URL ================================");
             unlink(__DIR__ . '/request');
@@ -174,12 +190,18 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             logM("Info:\nStatus: $status \nMuted: $muted \nViewer Count: $count");
             unlink(__DIR__ . '/request');
         } elseif ($cmd == 'viewers') {
-            $output = '';
+            logM("Viewers:");
             $ig->live->getInfo($broadcastId);
+            $vCount = 0;
             foreach ($ig->live->getViewerList($broadcastId)->getUsers() as &$cuser) {
-                $output .= "@" . $cuser->getUsername() . " (" . $cuser->getFullName() . ")\n";
+                logM("@" . $cuser->getUsername() . " (" . $cuser->getFullName() . ")\n");
+                $vCount++;
             }
-            logM($output);
+            if ($vCount > 0) {
+                logM("Total Count: ".$vCount);
+            } else {
+                logM("There are no live viewers.");
+            }
             unlink(__DIR__ . '/request');
         }
         // Get broadcast comments.
@@ -216,6 +238,10 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
 
 /**
  * The handler for interpreting the commands passed via the command line.
+ * @param Live $live Instagram live endpoints.
+ * @param string $broadcastId The id of the live stream.
+ * @param string $streamUrl The rtmp link of the stream.
+ * @param string $streamKey The stream key.
  */
 function newCommand(Live $live, $broadcastId, $streamUrl, $streamKey)
 {
@@ -271,6 +297,7 @@ function newCommand(Live $live, $broadcastId, $streamUrl, $streamKey)
 
 /**
  * Logs a message in console but it actually uses new lines.
+ * @param string $message message to be logged.
  */
 function logM($message)
 {
