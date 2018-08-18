@@ -1,3 +1,7 @@
+# PhpStorm
+.idea/
+
+# Composer
 vendor/
 composer.lock
-config.php
+composer.phar
