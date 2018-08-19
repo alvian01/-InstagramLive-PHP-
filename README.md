@@ -39,6 +39,8 @@ This is usually due to archiving a stream that had no content (video). Just dele
 This is due to CURL not having a valid CA. You can find a solution here: [https://stackoverflow.com/a/34883260](https://stackoverflow.com/a/34883260).
 #### I get "CURL Error 28: Operation timed out after x milliseconds with 0 bytes received."
 This means Instagram is refusing to connect to your proxy/computer. This could be for a wide verity of different reasons. I cannot help you when this if this happens, it's out of my control and there is nothing you can do to fix this other than changing your IP Address or actual computer you are using. Additionally, a proxy or VPN could create this issue.
+### Question not listed here?
+If your question is not listed here, [join our discord](https://discord.gg/EpkKFt3) so I can help support you faster. [https://discord.gg/EpkKFt3](https://discord.gg/EpkKFt3)
 # Donate
 If you would like to donate to me because you find what I do useful and would like to support me, you can do so through this methods:
 
