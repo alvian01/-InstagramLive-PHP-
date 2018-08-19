@@ -63,10 +63,11 @@ function newCommand()
     newCommand();
 }
 
-function sendRequest(string $cmd, $values) {
+function sendRequest(string $cmd, $values)
+{
     /** @noinspection PhpComposerExtensionStubsInspection */
     file_put_contents(__DIR__ . '/request', json_encode([
-        'cmd'    => $cmd,
+        'cmd' => $cmd,
         'values' => isset($values) ? $values : [],
     ]));
     logM("Please wait while we ensure the live script has received our request.");

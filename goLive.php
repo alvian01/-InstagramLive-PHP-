@@ -12,6 +12,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 use InstagramAPI\Instagram;
 use InstagramAPI\Request\Live;
+use InstagramAPI\Response\Model\User;
+use InstagramAPI\Response\Model\Comment;
 
 require_once 'config.php';
 /////// (Sorta) Config (Still Don't Touch It) ///////
@@ -93,10 +95,10 @@ try {
     echo 'Error While Creating Livestream: ' . $e->getMessage() . "\n";
 }
 
-function addLike(\InstagramAPI\Response\Model\User $user)
+function addLike(User $user)
 {
     global $cfg_callbacks;
-    logM("@".$user->getUsername()." has liked the stream!");
+    logM("@" . $user->getUsername() . " has liked the stream!");
     if (
         $cfg_callbacks &&
         isset($cfg_callbacks['like']) &&
@@ -106,7 +108,7 @@ function addLike(\InstagramAPI\Response\Model\User $user)
     }
 }
 
-function addComment(\InstagramAPI\Response\Model\Comment $comment)
+function addComment(Comment $comment)
 {
     global $cfg_callbacks;
     logM("Comment [ID " . $comment->getMediaId() . "] @" . $comment->getUser()->getUsername() . ": " . $comment->getText());
@@ -121,7 +123,7 @@ function addComment(\InstagramAPI\Response\Model\Comment $comment)
 
 function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKey)
 {
-    pclose(popen("start \"Command Line Input\" ".PHP_BINARY." commandLine.php", "r"));
+    pclose(popen("start \"Command Line Input\" " . PHP_BINARY . " commandLine.php", "r"));
     cli_set_process_title("Live Chat and Like Output");
     $lastCommentTs = 0;
     $lastLikeTs = 0;
@@ -198,7 +200,7 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
                 $vCount++;
             }
             if ($vCount > 0) {
-                logM("Total Count: ".$vCount);
+                logM("Total Count: " . $vCount);
             } else {
                 logM("There are no live viewers.");
             }
