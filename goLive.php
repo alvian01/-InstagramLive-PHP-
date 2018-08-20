@@ -133,86 +133,76 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
     @unlink(__DIR__ . '/request');
 
     do {
-        $cmd = '';
-        $values = [];
         /** @noinspection PhpComposerExtensionStubsInspection */
         $request = json_decode(@file_get_contents(__DIR__ . '/request'), true);
         if (!empty($request)) {
             $cmd = $request['cmd'];
             $values = $request['values'];
-        }
-        if ($cmd == 'ecomments') {
-            $ig->live->enableComments($broadcastId);
-            logM("Enabled Comments!");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'dcomments') {
-            $ig->live->disableComments($broadcastId);
-            logM("Disabled Comments!");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'end') {
-            $archived = $values[0];
-            logM("Wrapping up and exiting...");
-            //Needs this to retain, I guess?
-            $ig->live->getFinalViewerList($broadcastId);
-            $ig->live->end($broadcastId);
-            if ($archived == 'yes') {
-                $ig->live->addToPostLive($broadcastId);
-                logM("Livestream added to Archive!");
-            }
-            logM("Ended stream!");
-            unlink(__DIR__ . '/request');
-            sleep(2);
-            exit();
-        } elseif ($cmd == 'pin') {
-            $commentId = $values[0];
-            $ig->live->pinComment($broadcastId, $commentId);
-            $lastCommentPin = $commentId;
-            logM("Pinned a comment!");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'unpin') {
-            if ($lastCommentPin == -1) {
-                logM("You have no comment pinned!");
-            } else {
-                $ig->live->unpinComment($broadcastId, $lastCommentPin);
-                $lastCommentPin = -1;
-                logM("Unpinned the pinned comment!");
-            }
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'url') {
-            logM("================================ Stream URL ================================\n" . $streamUrl . "\n================================ Stream URL ================================");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'key') {
-            logM("======================== Current Stream Key ========================\n" . $streamKey . "\n======================== Current Stream Key ========================");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'info') {
-            $info = $ig->live->getInfo($broadcastId);
-            $status = $info->getStatus();
-            $muted = var_export($info->is_Messages(), true);
-            $count = $info->getViewerCount();
-            logM("Info:\nStatus: $status \nMuted: $muted \nViewer Count: $count");
-            unlink(__DIR__ . '/request');
-        } elseif ($cmd == 'viewers') {
-            logM("Viewers:");
-            $ig->live->getInfo($broadcastId);
-            $vCount = 0;
-            foreach ($ig->live->getViewerList($broadcastId)->getUsers() as &$cuser) {
-                logM("@" . $cuser->getUsername() . " (" . $cuser->getFullName() . ")\n");
-                $vCount++;
-            }
-            if ($vCount > 0) {
-                logM("Total Count: " . $vCount);
-            } else {
-                logM("There are no live viewers.");
+            if ($cmd == 'ecomments') {
+                $ig->live->enableComments($broadcastId);
+                logM("Enabled Comments!");
+            } elseif ($cmd == 'dcomments') {
+                $ig->live->disableComments($broadcastId);
+                logM("Disabled Comments!");
+            } elseif ($cmd == 'end') {
+                $archived = $values[0];
+                logM("Wrapping up and exiting...");
+                //Needs this to retain, I guess?
+                $ig->live->getFinalViewerList($broadcastId);
+                $ig->live->end($broadcastId);
+                if ($archived == 'yes') {
+                    $ig->live->addToPostLive($broadcastId);
+                    logM("Livestream added to Archive!");
+                }
+                logM("Ended stream!");
+                unlink(__DIR__ . '/request');
+                sleep(2);
+                exit();
+            } elseif ($cmd == 'pin') {
+                $commentId = $values[0];
+                $ig->live->pinComment($broadcastId, $commentId);
+                $lastCommentPin = $commentId;
+                logM("Pinned a comment!");
+            } elseif ($cmd == 'unpin') {
+                if ($lastCommentPin == -1) {
+                    logM("You have no comment pinned!");
+                } else {
+                    $ig->live->unpinComment($broadcastId, $lastCommentPin);
+                    $lastCommentPin = -1;
+                    logM("Unpinned the pinned comment!");
+                }
+            } elseif ($cmd == 'url') {
+                logM("================================ Stream URL ================================\n" . $streamUrl . "\n================================ Stream URL ================================");
+            } elseif ($cmd == 'key') {
+                logM("======================== Current Stream Key ========================\n" . $streamKey . "\n======================== Current Stream Key ========================");
+            } elseif ($cmd == 'info') {
+                $info = $ig->live->getInfo($broadcastId);
+                $status = $info->getStatus();
+                $muted = var_export($info->is_Messages(), true);
+                $count = $info->getViewerCount();
+                logM("Info:\nStatus: $status \nMuted: $muted \nViewer Count: $count");
+            } elseif ($cmd == 'viewers') {
+                logM("Viewers:");
+                $ig->live->getInfo($broadcastId);
+                $vCount = 0;
+                foreach ($ig->live->getViewerList($broadcastId)->getUsers() as &$cuser) {
+                    logM("@" . $cuser->getUsername() . " (" . $cuser->getFullName() . ")\n");
+                    $vCount++;
+                }
+                if ($vCount > 0) {
+                    logM("Total Count: " . $vCount);
+                } else {
+                    logM("There are no live viewers.");
+                }
             }
             unlink(__DIR__ . '/request');
         }
-        // Get broadcast comments.
-        // - The latest comment timestamp will be required for the next
-        //   getComments() request.
-        // - There are two types of comments: System comments and user comments.
-        //   We compare both and keep the newest (most recent) timestamp.
+
+        //Request comments since the last time we checked
         $commentsResponse = $ig->live->getComments($broadcastId, $lastCommentTs);
+        //I have no idea what this does lmao
         $systemComments = $commentsResponse->getSystemComments();
+        //Get the actual comments from the request we made
         $comments = $commentsResponse->getComments();
         if (!empty($systemComments)) {
             $lastCommentTs = end($systemComments)->getCreatedAt();
@@ -223,11 +213,9 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
         foreach ($comments as $comment) {
             addComment($comment);
         }
-        // Get broadcast heartbeat and viewer count.
+        //Maintain :clap: comments :clap: and :clap: likes :clap: after :clap: stream
         $ig->live->getHeartbeatAndViewerCount($broadcastId);
-        // Get broadcast like count.
-        // - The latest like timestamp will be required for the next
-        //   getLikeCount() request.
+        //Get our current batch for likes.
         $likeCountResponse = $ig->live->getLikeCount($broadcastId, $lastLikeTs);
         $lastLikeTs = $likeCountResponse->getLikeTs();
         foreach ($likeCountResponse->getLikers() as $user) {
