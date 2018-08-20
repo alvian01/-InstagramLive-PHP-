@@ -111,7 +111,7 @@ function addLike(User $user)
 function addComment(Comment $comment)
 {
     global $cfg_callbacks;
-    logM("Comment [ID " . $comment->getMediaId() . "] @" . $comment->getUser()->getUsername() . ": " . $comment->getText());
+    logM("Comment [ID " . $comment->getPk() . "] @" . $comment->getUser()->getUsername() . ": " . $comment->getText());
     if (
         $cfg_callbacks &&
         isset($cfg_callbacks['comment']) &&
