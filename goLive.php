@@ -162,8 +162,14 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
                 exit();
             } elseif ($cmd == 'pin') {
                 $commentId = $values[0];
-                $ig->live->pinComment($broadcastId, $commentId);
-                logM("Pinned a comment!");
+                if (strlen($commentId) === 17 && //Comment IDs are 17 digits
+                    is_numeric($commentId) && //Comment IDs only contain numbers
+                    strpos($commentId, '-') === false) { //Comment IDs are not negitive
+                    $ig->live->pinComment($broadcastId, $commentId);
+                    logM("Pinned a comment!");
+                } else {
+                    logM("You entered an invalid comment id!");
+                }
             } elseif ($cmd == 'unpin') {
                 if ($lastCommentPin == -1) {
                     logM("You have no comment pinned!");
@@ -218,7 +224,7 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
         }
 
         if ($commentsResponse->isPinnedComment()) {
-            $pinnedComment = $commentsResponse ->getPinnedComment();
+            $pinnedComment = $commentsResponse->getPinnedComment();
             $lastCommentPin = $pinnedComment->getPk();
             $lastCommentPinHandle = $pinnedComment->getUser()->getUsername();
             $lastCommentPinText = $pinnedComment->getText();
