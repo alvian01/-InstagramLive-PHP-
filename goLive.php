@@ -128,6 +128,8 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
     $lastCommentTs = 0;
     $lastLikeTs = 0;
     $lastCommentPin = -1;
+    $lastCommentPinHandle = '';
+    $lastCommentPinText = '';
     $exit = false;
 
     @unlink(__DIR__ . '/request');
@@ -161,15 +163,19 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             } elseif ($cmd == 'pin') {
                 $commentId = $values[0];
                 $ig->live->pinComment($broadcastId, $commentId);
-                $lastCommentPin = $commentId;
                 logM("Pinned a comment!");
             } elseif ($cmd == 'unpin') {
                 if ($lastCommentPin == -1) {
                     logM("You have no comment pinned!");
                 } else {
                     $ig->live->unpinComment($broadcastId, $lastCommentPin);
-                    $lastCommentPin = -1;
                     logM("Unpinned the pinned comment!");
+                }
+            } elseif ($cmd == 'pinned') {
+                if ($lastCommentPin == -1) {
+                    logM("There is no comment pinned!");
+                } else {
+                    logM("Pinned Comment:\n @" . $lastCommentPinHandle . ': ' . $lastCommentPinText);
                 }
             } elseif ($cmd == 'url') {
                 logM("================================ Stream URL ================================\n" . $streamUrl . "\n================================ Stream URL ================================");
@@ -210,6 +216,16 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
         if (!empty($comments) && end($comments)->getCreatedAt() > $lastCommentTs) {
             $lastCommentTs = end($comments)->getCreatedAt();
         }
+
+        if ($commentsResponse->isPinnedComment()) {
+            $pinnedComment = $commentsResponse ->getPinnedComment();
+            $lastCommentPin = $pinnedComment->getPk();
+            $lastCommentPinHandle = $pinnedComment->getUser()->getUsername();
+            $lastCommentPinText = $pinnedComment->getText();
+        } else {
+            $lastCommentPin = -1;
+        }
+
         foreach ($comments as $comment) {
             addComment($comment);
         }

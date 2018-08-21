@@ -42,6 +42,9 @@ function newCommand()
     } elseif ($line == 'unpin') {
         logM("Please check the other window to see if the unpin succeeded!");
         sendRequest("unpin", null);
+    } elseif ($line == 'pinned') {
+        logM("Please check the other window to see the pinned comment!");
+        sendRequest("pinned", null);
     } elseif ($line == 'url') {
         logM("Please check the other window for your stream url!");
         sendRequest("url", null);
@@ -55,7 +58,7 @@ function newCommand()
         logM("Please check the other window for your viewers list!");
         sendRequest("viewers", null);
     } elseif ($line == 'help') {
-        logM("Commands:\nhelp - Prints this message\nurl - Prints Stream URL\nkey - Prints Stream Key\ninfo - Grabs Stream Info\nviewers - Grabs Stream Viewers\necomments - Enables Comments\ndcomments - Disables Comments\npin - Pins a Comment\nunpin - Unpins a comment if one is pinned\nstop - Stops the Live Stream");
+        logM("Commands:\nhelp - Prints this message\nurl - Prints Stream URL\nkey - Prints Stream Key\ninfo - Grabs Stream Info\nviewers - Grabs Stream Viewers\necomments - Enables Comments\ndcomments - Disables Comments\npin - Pins a Comment\nunpin - Unpins a comment if one is pinned\npinned - Gets the currently pinned comment\nstop - Stops the Live Stream");
     } else {
         logM("Invalid Command. Type \"help\" for help!");
     }
