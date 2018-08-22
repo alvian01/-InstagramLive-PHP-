@@ -43,7 +43,7 @@ try {
     }
 } catch (\Exception $e) {
     if (strpos($e->getMessage(), "Challenge") !== false) {
-        logM("Account Flagged: Please sign out of all phones and try logging into instagram.com from this computer before trying to run this script again!");
+        logM("Account Flagged: Please try logging into instagram.com from this exact computer before trying to run this script again!");
         exit();
     }
     echo 'Error While Logging in to Instagram: ' . $e->getMessage() . "\n";
