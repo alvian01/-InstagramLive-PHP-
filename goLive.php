@@ -183,6 +183,14 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
                 } else {
                     logM("Pinned Comment:\n @" . $lastCommentPinHandle . ': ' . $lastCommentPinText);
                 }
+            } elseif ($cmd == 'comment') {
+                $text = $values[0];
+                if ($text !== "") {
+                    $ig->live->comment($broadcastId, $text);
+                    logM("Commented on stream!");
+                } else {
+                    logM("Comments may not be empty!");
+                }
             } elseif ($cmd == 'url') {
                 logM("================================ Stream URL ================================\n" . $streamUrl . "\n================================ Stream URL ================================");
             } elseif ($cmd == 'key') {
