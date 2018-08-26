@@ -236,9 +236,12 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             $lastCommentPin = -1;
         }
 
-        foreach ($comments as $comment) {
-            addComment($comment);
+        if (!empty($comments)) {
+            foreach ($comments as $comment) {
+                addComment($comment);
+            }
         }
+
         //Maintain :clap: comments :clap: and :clap: likes :clap: after :clap: stream
         $ig->live->getHeartbeatAndViewerCount($broadcastId);
         //Get our current batch for likes.
