@@ -23,9 +23,9 @@ function newCommand()
         $handle = fopen("php://stdin", "r");
         $archived = trim(fgets($handle));
         if ($archived == 'yes') {
-            sendRequest("end", ["no"]);
-        } else {
             sendRequest("end", ["yes"]);
+        } else {
+            sendRequest("end", ["no"]);
         }
         logM("Command Line Exiting! Stream *should* be ended.");
         sleep(2);
