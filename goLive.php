@@ -103,28 +103,12 @@ try {
 
 function addLike(User $user)
 {
-    global $cfg_callbacks;
     logM("@" . $user->getUsername() . " has liked the stream!");
-    if (
-        $cfg_callbacks &&
-        isset($cfg_callbacks['like']) &&
-        is_callable($cfg_callbacks['like'])
-    ) {
-        $cfg_callbacks['like']($user);
-    }
 }
 
 function addComment(Comment $comment)
 {
-    global $cfg_callbacks;
     logM("Comment [ID " . $comment->getPk() . "] @" . $comment->getUser()->getUsername() . ": " . $comment->getText());
-    if (
-        $cfg_callbacks &&
-        isset($cfg_callbacks['comment']) &&
-        is_callable($cfg_callbacks['comment'])
-    ) {
-        $cfg_callbacks['comment']($comment->getUser(), $comment);
-    }
 }
 
 function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKey)
