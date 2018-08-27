@@ -28,6 +28,12 @@ If you'd like a video version of this tutorial, see [this video](https://www.you
 6. Start Streaming in OBS
 7. To stop streaming, run the "stop" command in your terminal and then press "Stop Streaming" in OBS
 * Note: To emulate the exact content being sent to Instagram, set your OBS canvas size to 720x1280. This can be done by going to Settings->Video and editing Base Canvas Resolution to "720x1280".
+# Comment & Like Viewing
+To view comments and likes as you are streaming, you'll need a Windows machine as this script's async support only works on Windows. When you run the script on Windows, after it logs you in, it will open a second screen where you can enter commands as the first screen will output comments and likes.
+
+Linux/Mac support is planned for a future release.
+# Commands
+InstagramLive-PHP has a plenty of commands to aid in live streaming. To view them, along with which commands work on what operating system, [visit the wiki by clicking here](https://github.com/JRoy/InstagramLive-PHP/wiki/Commands) to view the table of commands and their descriptions. 
 # FAQ
 #### OBS gives a "Failed to connect" error
 This is mostly due to an invalid stream key: The stream key changes **every** time you start a new stream so it must be replaced in OBS every time.
