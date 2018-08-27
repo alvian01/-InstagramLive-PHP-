@@ -1,6 +1,6 @@
 <?php
 if (php_sapi_name() !== "cli") {
-    die("You may only run this inside of the PHP Command Line! If you did run this in the command line, please report: \"" . php_sapi_name() . "\" to the InstagramLive-PHP Repo!");
+    die("You may only run this script inside of the PHP Command Line! If you did run this in the command line, please report: \"" . php_sapi_name() . "\" to the InstagramLive-PHP Repo!");
 }
 
 logM("Loading InstagramLive-PHP v0.5...");
@@ -89,7 +89,7 @@ try {
         logM("You are using Windows! Therefore, your system supports the viewing of comments and likes!\nThis window will turn into the comment and like view and console output.\nA second window will open which will allow you to dispatch commands!");
         beginListener($ig, $broadcastId, $streamUrl, $streamKey);
     } else {
-        logM("You are not using Windows! Therefore, the script has been put into legacy mode. New commands may not be added to legacy mode but backend features will remain.\nIt is recommended that you use Windows for the full experience!");
+        logM("You are not using Windows! Therefore, the script has been put into legacy mode. New commands may not be added to legacy mode but backend features will remain updated.\nIt is recommended that you use Windows for the full experience!");
         logM("Live Stream is Ready for Commands:");
         newCommand($ig->live, $broadcastId, $streamUrl, $streamKey);
     }
@@ -214,12 +214,9 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             unlink(__DIR__ . '/request');
         }
 
-        //Request comments since the last time we checked
-        $commentsResponse = $ig->live->getComments($broadcastId, $lastCommentTs);
-        //I have no idea what this does lmao
-        $systemComments = $commentsResponse->getSystemComments();
-        //Get the actual comments from the request we made
-        $comments = $commentsResponse->getComments();
+        $commentsResponse = $ig->live->getComments($broadcastId, $lastCommentTs); //Request comments since the last time we checked
+        $systemComments = $commentsResponse->getSystemComments(); //No idea what system comments are, but we need to so we can track comments
+        $comments = $commentsResponse->getComments(); //Get the actual comments from the request we made
         if (!empty($systemComments)) {
             $lastCommentTs = end($systemComments)->getCreatedAt();
         }
@@ -242,10 +239,8 @@ function beginListener(Instagram $ig, string $broadcastId, $streamUrl, $streamKe
             }
         }
 
-        //Maintain :clap: comments :clap: and :clap: likes :clap: after :clap: stream
-        $ig->live->getHeartbeatAndViewerCount($broadcastId);
-        //Get our current batch for likes.
-        $likeCountResponse = $ig->live->getLikeCount($broadcastId, $lastLikeTs);
+        $ig->live->getHeartbeatAndViewerCount($broadcastId); //Maintain :clap: comments :clap: and :clap: likes :clap: after :clap: stream
+        $likeCountResponse = $ig->live->getLikeCount($broadcastId, $lastLikeTs); //Get our current batch for likes
         $lastLikeTs = $likeCountResponse->getLikeTs();
         foreach ($likeCountResponse->getLikers() as $user) {
             $user = $ig->people->getInfoById($user->getUserId())->getUser();
